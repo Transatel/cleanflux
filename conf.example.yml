@@ -1,0 +1,95 @@
+---
+
+# ------------------------------------------------------------------------
+# GENERAL
+
+host: 0.0.0.0
+port: 8087
+
+# InfluxDB backend to
+backend_host: localhost
+backend_port: 8086
+
+# PID file location when launching as a service
+pidfile: /tmp/cleanflux.pid
+
+# some features are implemented as modules
+# leave as is
+rules:
+  - remove_partial_intervals_case_sum_group_by_time
+  - handle_counter_wrap_non_negative_derivative
+
+
+## ------------------------------------------------------------------------
+## LOGGING
+
+# Supported values: DEBUG, INFO, WARNING, ERROR, CRITICAL, FATAL
+log_level: INFO
+
+# When `use_syslog` is True, would log to syslog socket and ignore the logfile param
+use_syslog: False
+logfile: /var/log/cleanflux/cleanflux.log
+
+
+## ------------------------------------------------------------------------
+## METRICS
+
+statsd_host: localhost
+statsd_port: 8125
+
+
+# ------------------------------------------------------------------------
+# COUNTER OVERFLOWS
+
+# we handle non-negative derivative for counters with module `handle_counter_wrap_non_negative_derivative`
+# especially useful for 32bit SNMP counters
+
+counter_overflows:
+  cacti_data: # InfluxDB schema name
+    interface.traffic: 4294967296
+  # ...
+
+
+# ------------------------------------------------------------------------
+# DOWNSAMPLING
+
+aggregation_properties:
+  mongodb: # InfluxDB schema name
+    - function: mean
+      regexp: .* # regexp matching measurements
+  # if present, catch-all rules
+  # ...
+  default:
+    - function: sum
+      regexp: timer_.*
+    - function: sum
+      regexp: counter_.*
+    - function: mean
+      regexp: gauge_.*
+
+
+# ------------------------------------------------------------------------
+# RETENTION POLICIES AUTO-SELECTION
+
+retention_policies:
+  mongodb: # InfluxDB schema name
+    - default: true
+      duration: 168h0m0s
+      interval: 10s
+      name: autogen
+  my_app: # InfluxDB schema name
+    - default: true
+      duration: 168h0m0s
+      interval: 10s
+      name: 1_week
+    - duration: 2160h0m0s
+      interval: 10m
+      name: 3_month
+    - duration: 8760h0m0s
+      interval: 1h
+      name: 1_year
+    - duration: 87600h0m0s
+      interval: 3h
+      name: 10_year
+  # ...
+

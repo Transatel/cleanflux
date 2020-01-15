@@ -1,0 +1,15 @@
+name: cleanflux-env
+dependencies:
+- python=2
+- pip
+- coverage=4.5.3
+- python-dateutil=2.7.5
+- pytz=2018.9
+- pyyaml=3.13
+- sqlparse=0.2.4
+- datadog=0.29.3
+- pip:
+    - daemonocle==1.0.1
+    - result==0.1.1
+    - pandas==0.20.3
+    - influxdb==4.1.1

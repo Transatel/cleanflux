@@ -135,7 +135,7 @@ Configuration:
     max_nb_points_per_query:
 
 This should be set in accordance with the `max-row-limit` parameter in InfluxDB configuration.
-For example for a `max-row-limit` of 300000 and a `max_nb_points_per_series``of 1000, results would start to get truncated at the 301st series (1 + 300k / 1k).
+For example for a `max-row-limit` of 300000 and a `max_nb_points_per_series` of 1000, results would start to get truncated at the 301st series (1 + 300k / 1k).
 
 #### Accurate
 

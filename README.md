@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project should ideally not exist and was invoked out of necessity.
+This project should ideally not exist and was created out of necessity.
 
 Its acts as a proxy for an [InfluxDB](https://github.com/influxdata/influxdb) backend, sanitizing the output of strangely behaving InfluxQL queries.
 

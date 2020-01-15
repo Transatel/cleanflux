@@ -88,7 +88,7 @@ Configuration should follow this syntax:
 
 The `interval` fields are optional and correspond to the interval between 2 points, i.e. the precision of the measurements.
 
-For `SUM() ... GROUP BY time()`, in order to apply the correct ratio, Cleanflux needs to know the function used for downsampling (either `sum` or `mean`).*
+For `SUM() ... GROUP BY time()`, in order to apply the correct ratio, Cleanflux needs to know the function used for downsampling (either `sum` or `mean`).
 This function is defined in the downsampling configuration (via [CQs](https://docs.influxdata.com/influxdb/latest/query_language/continuous_queries/), [Kapacitor](https://docs.influxdata.com/kapacitor/latest/)...).
 
 This is why we need to declare it in the `aggregation_properties` section.
@@ -107,7 +107,8 @@ Default rules can be specified with the special `default` schema name:
 
 #### About InfluxDB Retention Policy Intervals
 
-When defining an InfluxDB retention policy, you must precise a retention duration interval.
+When defining an InfluxDB retention policy, you must prec
+a retention duration interval.
 
 To maximize the rendered precision, we recommend intervals that match Grafana predefined ranges.
 
@@ -127,7 +128,7 @@ There are 2 supported implementations.
 
 The first and most lightweight downsamples according to an estimate of the number of points the query would return for 1 series.
 
-It ise better suited for when we know the max expected number of series any queries can produce.
+It is better suited for when we know the max expected number of series any queries can produce.
 
 Configuration:
 
@@ -294,7 +295,8 @@ Please note that stack traces are logged.
 
 ### Metrics
 
-Cleanflux can produce metrics in [Datadog StatsD format](https://docs.datadoghq.com/developers/dogstatsd/?tab=python) using the [datadog](https://datadogpy.readthedocs.io/en/latest/) python module. This derived allows meta-data (_"tags"_) to be transmitted alongside the values.
+Cleanflux can produce metrics in [Datadog StatsD format](https://docs.datadoghq.com/developers/dogstatsd/?tab=python) using the [datadog](https://datadogpy.readthedocs.io/en/latest/) python module.
+This derived protocol allows meta-data (_"tags"_) to be transmitted alongside the values.
 
 To enable the collection of those metrics put this in config.yml:
 

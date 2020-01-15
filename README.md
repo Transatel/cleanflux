@@ -21,7 +21,7 @@ Do not hesitate to submit pull request to propose correction to those.
 
 ## Features
 
-### Automatic Retention Policy selection (issue [#7198](https://github.com/influxdata/influxdb/issues/7198]))
+### Automatic Retention Policy selection (issue #7198)
 
 Automatic Retention Policy selection is implemented ([source](cleanflux/utils/influx/rp_auto_selection.py)).
 
@@ -94,7 +94,7 @@ This function is defined in the downsampling configuration (via [CQs](https://do
 This is why we need to declare it in the `aggregation_properties` section.
 
 Default rules can be specified with the special `default` schema name:
-    
+
     aggregation_properties:
       default:
         - regexp: 'timer_.*'
@@ -102,8 +102,8 @@ Default rules can be specified with the special `default` schema name:
         - regexp: 'counter_.*'
           function: sum
         - regexp: 'gauge_.*'
-          function: mean  
-    
+          function: mean
+
 
 #### About InfluxDB Retention Policy Intervals
 
@@ -112,7 +112,7 @@ When defining an InfluxDB retention policy, you must precise a retention duratio
 To maximize the rendered precision, we recommend intervals that match Grafana predefined ranges.
 
 For example:
- 
+
     CREATE RETENTION POLICY "3_month" ON my_schema DURATION 90d REPLICATION <n>;
     CREATE RETENTION POLICY "1_year" ON my_schema DURATION 365d REPLICATION <n>;
     CREATE RETENTION POLICY "10_year" ON my_schema DURATION 3650d REPLICATION <n>;
@@ -151,9 +151,9 @@ Configuration:
 We can configure it with the same value as the `max-row-limit` parameter in InfluxDB configuration.
 
 
-### Removal of Partial Intervals case `SUM() ... GROUP BY time()` (issues [#5961](https://github.com/grafana/grafana/issues/5961) and [#6451](https://github.com/influxdata/influxdb/issues/6451))
+### Removal of Partial Intervals case `SUM() ... GROUP BY time()` (issues #8010 & #6451)
 
-Solves issue listed in [issue #5961](https://github.com/grafana/grafana/issues/5961) (see also [issue #8010](https://github.com/influxdata/influxdb/issues/8010)).
+Solves issue listed in [issue #8010](https://github.com/influxdata/influxdb/issues/8010) (see also [Grafana issue #5961](https://github.com/grafana/grafana/issues/5961)).
 
 ![issue #5961](img/sum_gbt_issue.png)
 
@@ -172,11 +172,13 @@ Furthermore, (as of InfluxDB 1.1.1) the secondary argument for the `GROUP BY tim
 
 Please note that it might not work properly for queries with the time boundaries WHERE clause is surrounded by parenthesis.
 
+
 ## Configuration
 
 An example configuration file at [conf.example.yml](conf.example.yml).
 
 In the rest of this documentation, it is assumed that it gets deployed at `/etc/cleanflux.yml`.
+
 
 ## Running
 
@@ -194,12 +196,12 @@ Instead, we rely on the more modern environment.yml file.
 The env name is defined in this file.
 
 To instantiate the conda env for the project, in a shell placed in the project root directory:
-    
+
     $ conda env create
 
 #### Classic Virtual Env
 
-Once you have created the virtual env, install dependencies by
+Once you have created the virtual env, install dependencies by:
 
     pip install -r requirements_pip.txt
 
@@ -281,7 +283,7 @@ This app can log either to a custom file:
     logfile: /var/log/cleanflux.log
 
 Or to syslog:
-    
+
     use_syslog: true
 
 When using syslog, one can log to the local syslog instance or to a remote one:
@@ -292,7 +294,7 @@ Please note that stack traces are logged.
 
 ### Metrics
 
-Cleanflux can produce metrics in [Datadog StatsD format](https://docs.datadoghq.com/developers/dogstatsd/?tab=python) using the [datadog](https://datadogpy.readthedocs.io/en/latest/) python module. This derived allows meta-data (_"tags"_) to be transmitted alongside the values. 
+Cleanflux can produce metrics in [Datadog StatsD format](https://docs.datadoghq.com/developers/dogstatsd/?tab=python) using the [datadog](https://datadogpy.readthedocs.io/en/latest/) python module. This derived allows meta-data (_"tags"_) to be transmitted alongside the values.
 
 To enable the collection of those metrics put this in config.yml:
 
@@ -320,7 +322,7 @@ If using option #2, you can then bind the conda env with IntelliJ:
  - `Project Structure > Platform Settings > SDK ` (`Control-Alt-Shift + S`).
  - Click the `+` button, then select `Python SDK` from the dop down list.
  - Select the python executable for your env.
- 
+
    Under windows, it would be at location like `C:\ProgramData\Anaconda2\envs\<env-name>\python.exe`.
  - Associate the env to the project, by going to menu `Project Structure > Project Settings > Project > Project SDK` and selecting it from the drop-down list.
 

@@ -40,7 +40,7 @@ def sqlparse_query(query):
 def stringify_sqlparsed(parsed):
     query = ''
     for token in parsed.tokens:
-        if isinstance(token, str) or isinstance(token, unicode):
+        if isinstance(token, bytes) or isinstance(token, str):
             query += token
         else:
             query += token.value
@@ -167,7 +167,7 @@ def extract_all_columns_in_select(parsed):
         elif isinstance(token, sqlparse.sql.IdentifierList):
             # complex statements, several columns returned
             columns = split_columns(token.value)
-        elif isinstance(token, str) or isinstance(token, unicode):
+        elif isinstance(token, bytes) or isinstance(token, str):
             # previously reworked column
             columns = split_columns(token)
         elif token.ttype == sqlparse.tokens.Keyword and token.value.upper() == 'FROM':
@@ -181,8 +181,8 @@ def get_token_index_columns_in_select(parsed):
                 or isinstance(token, sqlparse.sql.Identifier) \
                 or isinstance(token, sqlparse.sql.Operation) \
                 or isinstance(token, sqlparse.sql.IdentifierList) \
-                or isinstance(token, str) \
-                or isinstance(token, unicode):
+                or isinstance(token, bytes) \
+                or isinstance(token, str):
             return i
 
 
@@ -240,8 +240,8 @@ def extract_from_helper(parsed, mode):
     for i, token in enumerate(parsed.tokens):
         if has_whitespace:
             # if isinstance(token, sqlparse.sql.Identifier):
-            if isinstance(token, str) \
-               or isinstance(token, unicode) \
+            if isinstance(token, bytes) \
+               or isinstance(token, str) \
                or isinstance(token, sqlparse.sql.Token):
                 if mode == "value":
                     if isinstance(token, sqlparse.sql.Token):
@@ -259,7 +259,7 @@ def extract_from_helper(parsed, mode):
             else:
                 has_from = False
             continue
-        if isinstance(token, str) or isinstance(token, unicode):
+        if isinstance(token, bytes) or isinstance(token, str):
             # reworked columns
             continue
         if token.ttype == sqlparse.tokens.Keyword and token.value.upper() == 'FROM':
@@ -346,11 +346,11 @@ def extract_group_by_helper(parsed, mode):
             if isinstance(token, sqlparse.sql.IdentifierList):
                 if mode == "value":
                     by = str(token.value).split(',')
-                    by = map(str.strip, by)
+                    by = list(map(str.strip, by))
                     return by
                 else:
                     return i
-            elif isinstance(token, str) or isinstance(token, unicode):
+            elif isinstance(token, bytes) or isinstance(token, str):
                 # case only GROUP BY time()
                 if mode == "value":
                     by = [ token ]

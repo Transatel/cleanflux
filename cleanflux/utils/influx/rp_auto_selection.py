@@ -73,7 +73,7 @@ def update_query_to_limit_nb_points_per_series(from_parts, query, parsed_query,
             expected_nb_points_per_series['nb_points']) + ' is bigger than max allowed one (' + str(
             max_nb_points_per_series) + ')')
 
-        my_factor = expected_nb_points_per_series['nb_points'] / max_nb_points_per_series
+        my_factor = expected_nb_points_per_series['nb_points'] // max_nb_points_per_series
         split_group_by_time_interval = influx_date_manipulation.split_influx_time(
             expected_nb_points_per_series['group_by_time_interval'])
         adjusted_group_by_time_value = int(math.ceil(my_factor * split_group_by_time_interval['number']))
@@ -113,7 +113,7 @@ def update_query_to_limit_nb_points_for_query(backend_host, backend_port, user, 
             expected_nb_points_per_query['nb_points']) + ' is bigger than max allowed one (' + str(
             max_nb_points_per_query) + ')')
 
-        my_factor = expected_nb_points_per_query['nb_points'] / max_nb_points_per_query
+        my_factor = expected_nb_points_per_query['nb_points'] // max_nb_points_per_query
         split_group_by_time_interval = influx_date_manipulation.split_influx_time(
             expected_nb_points_per_query['group_by_time_interval'])
         adjusted_group_by_time_value = int(math.ceil(my_factor * split_group_by_time_interval['number']))
@@ -289,7 +289,7 @@ def get_expected_nb_points_per_series(query, parsed_query):
 
     return {
         'group_by_time_interval': group_by_time_interval,
-        'nb_points': int(query_window_ns / group_by_time_ns)
+        'nb_points': int(query_window_ns // group_by_time_ns)
     }
 
 

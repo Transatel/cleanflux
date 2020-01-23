@@ -1,8 +1,8 @@
 import sys
 import ssl
 import socket
-from SocketServer import ThreadingMixIn
-from BaseHTTPServer import HTTPServer
+from socketserver import ThreadingMixIn
+from http.server import HTTPServer
 
 
 class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):

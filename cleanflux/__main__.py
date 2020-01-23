@@ -71,7 +71,7 @@ def show_rules():
     config = loader.load_config()
     rules = import_rules(config.backend_host, config.backend_port, all_rules)
     print("")
-    for name, rule in rules.iteritems():
+    for name, rule in rules.items():
         heading = "{} (`{}`)".format(rule.description(), name)
         print("#### {} ####".format(heading))
         # for line in rule.reason():

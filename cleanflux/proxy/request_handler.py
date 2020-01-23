@@ -2,15 +2,15 @@ import os
 import socket
 import ssl
 import select
-import httplib
-import urlparse
+import urllib.parse
 import threading
 import gzip
 import zlib
 import time
 import logging
-from BaseHTTPServer import BaseHTTPRequestHandler
-from cStringIO import StringIO
+import http.client
+from http.server import BaseHTTPRequestHandler
+from io import StringIO
 from subprocess import Popen, PIPE
 
 from cleanflux.proxy.http_request import HTTPRequest
@@ -70,7 +70,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
                             "-set_serial", epoch, "-out", certpath], stdin=p1.stdout, stderr=PIPE)
                 p2.communicate()
 
-        self.wfile.write("%s %d %s\r\n" % (self.protocol_version, httplib.OK, 'Connection Established'))
+        self.wfile.write("%s %d %s\r\n" % (self.protocol_version, http.client.OK, 'Connection Established'))
         self.end_headers()
 
         self.connection = ssl.wrap_socket(self.connection, keyfile=self.certkey, certfile=certpath, server_side=True)
@@ -89,9 +89,9 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         try:
             s = socket.create_connection(address, timeout=self.timeout)
         except:
-            self.send_error(httplib.BAD_GATEWAY)
+            self.send_error(http.client.BAD_GATEWAY)
             return
-        self.send_response(httplib.OK, 'Connection Established')
+        self.send_response(http.client.OK, 'Connection Established')
         self.end_headers()
 
         conns = [self.connection, s]
@@ -126,7 +126,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         Get a list of all queries (q=... parameters) from an URL parameter string
         :param parameters: The url parameter list
         """
-        parsed_params = urlparse.parse_qs(parameters)
+        parsed_params = urllib.parse.parse_qs(parameters)
         if 'q' not in parsed_params:
             return []
         queries = parsed_params['q']
@@ -139,7 +139,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         # Foreach query param, split them if several queries in it
         queries_2 = []
         for q in queries:
-            queries_2 = queries_2 + filter(None, q.split(';'))
+            queries_2 = queries_2 + list(filter(None, q.split(';')))
 
         return queries_2
 
@@ -149,7 +149,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         Get teh schema (db=... parameters) from an URL parameter string
         :param parameters: The url parameter list
         """
-        parsed_params = urlparse.parse_qs(parameters)
+        parsed_params = urllib.parse.parse_qs(parameters)
         if 'db' not in parsed_params:
             return None
         elif isinstance(parsed_params['db'], list):
@@ -163,7 +163,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         Get teh schema (db=... parameters) from an URL parameter string
         :param parameters: The url parameter list
         """
-        parsed_params = urlparse.parse_qs(parameters)
+        parsed_params = urllib.parse.parse_qs(parameters)
         if 'u' not in parsed_params:
             return None
         return parsed_params['u']
@@ -174,7 +174,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         Get teh schema (db=... parameters) from an URL parameter string
         :param parameters: The url parameter list
         """
-        parsed_params = urlparse.parse_qs(parameters)
+        parsed_params = urllib.parse.parse_qs(parameters)
         if 'p' not in parsed_params:
             return None
         return parsed_params['p']
@@ -185,7 +185,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         Get teh schema (db=... parameters) from an URL parameter string
         :param parameters: The url parameter list
         """
-        parsed_params = urlparse.parse_qs(parameters)
+        parsed_params = urllib.parse.parse_qs(parameters)
         if 'epoch' not in parsed_params:
             return None
 
@@ -197,7 +197,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
 
     @staticmethod
     def _analyze_url(path):
-        url_parts = urlparse.urlsplit(path)
+        url_parts = urllib.parse.urlsplit(path)
         parameters = url_parts.query if url_parts.query else url_parts.path
         scheme, netloc, path = url_parts.scheme, url_parts.netloc, (url_parts.path + '?' + parameters)
         assert scheme in ('http', 'https')
@@ -224,14 +224,14 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
             # - Date: Tue, 17 Oct 2017 17:33:43 GMT
 
             error_reason = None
-            self.send_response(httplib.OK, error_reason)
+            self.send_response(http.client.OK, error_reason)
             if "request-id" in self.headers:
                 self.send_header("request-id", self.headers["request-id"])
             body = alt_data + "\n"
             self.send_header('content-type', 'application/json')
             self.send_header('Content-Length', str(len(body)))
             self.end_headers()
-            self.wfile.write(body)
+            self.wfile.write(body.encode())
             #pass
         else:
             # TODO: Is this needed?
@@ -250,7 +250,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         except Exception as e:
             body = "Invalid response from backend: '{}' Server might be busy".format(e.message)
             logging.debug(body)
-            self.send_error(httplib.SERVICE_UNAVAILABLE, body)
+            self.send_error(http.client.SERVICE_UNAVAILABLE, body)
 
     def do_POST(self):
         self.path = self._build_url(self.path, self.headers['Host'])
@@ -337,7 +337,7 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         with open(self.cacert, 'rb') as f:
             data = f.read()
 
-        self.wfile.write("%s %d %s\r\n" % (self.protocol_version, httplib.OK, 'OK'))
+        self.wfile.write("%s %d %s\r\n" % (self.protocol_version, http.client.OK, 'OK'))
         self.send_header('Content-Type', 'application/x-x509-ca-cert')
         self.send_header('Content-Length', len(data))
         self.send_header('Connection', 'close')

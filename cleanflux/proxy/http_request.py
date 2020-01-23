@@ -1,5 +1,5 @@
-from httplib import HTTPSConnection, HTTPConnection, IncompleteRead
-import urlparse
+from http.client import HTTPSConnection, HTTPConnection, IncompleteRead
+import urllib.parse
 import threading
 
 
@@ -16,7 +16,7 @@ class HTTPRequest(object):
         if headers is None:
             headers = dict()
 
-        parsed = urlparse.urlsplit(url)
+        parsed = urllib.parse.urlsplit(url)
         origin = (parsed.scheme, parsed.netloc)
 
         for i in range(1, max_retries):

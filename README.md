@@ -13,7 +13,7 @@ It works ideally between a [Grafana](https://grafana.com/) and an InfluxDB insta
 This was originally a fork of [trivago/Protector](https://github.com/trivago/Protector), an InfluxDB circuit breaker.
 All the HTTP proxying code comes from this project, so kudos to them.
 
-The project is build in Python (2.7) and expected to run on a [Miniconda](https://conda.io/miniconda.html) or [Anaconda](https://anaconda.org/) install.
+The project is build in Python and expected to run on a [Miniconda](https://conda.io/miniconda.html) or [Anaconda](https://anaconda.org/) install.
 
 Finally, I'm not a python expert, so don't be surprised to find all kinds of idiosyncrasies and anti-pythonic patterns.
 Do not hesitate to submit pull request to propose correction to those.
@@ -107,8 +107,7 @@ Default rules can be specified with the special `default` schema name:
 
 #### About InfluxDB Retention Policy Intervals
 
-When defining an InfluxDB retention policy, you must prec
-a retention duration interval.
+When defining an InfluxDB retention policy, you must precise a retention duration interval.
 
 To maximize the rendered precision, we recommend intervals that match Grafana predefined ranges.
 

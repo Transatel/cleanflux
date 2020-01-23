@@ -4,24 +4,24 @@ import logging
 import logging.handlers
 import sys
 import traceback
-import StringIO
+from io import StringIO
 from socket import gethostname
 from datadog import initialize as initialize_statsd
 
 from cleanflux.proxy import server
 from cleanflux.proxy import request_handler
-from cleanflux.utils.influx.querying import robustify_httplib_response_read, robustify_influxdb_client
+from cleanflux.utils.influx.querying import robustify_influxdb_client
 
 
 def add_custom_print_exception():
     old_print_exception = traceback.print_exception
-    def custom_print_exception(etype, value, tb, limit=None, file=None):
-        tb_output = StringIO.StringIO()
+    def custom_print_exception(etype, value, tb, limit=None, file=None, chain=True):
+        tb_output = StringIO()
         traceback.print_tb(tb, limit, tb_output)
         logger = logging.getLogger('')
         logger.error(tb_output.getvalue())
         tb_output.close()
-        old_print_exception(etype, value, tb, limit=None, file=None)
+        old_print_exception(etype, value, tb, limit=None, file=None, chain=chain)
     traceback.print_exception = custom_print_exception
 
 

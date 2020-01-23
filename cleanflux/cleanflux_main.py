@@ -1,6 +1,6 @@
 # coding=utf-8
 import logging
-import urllib
+import urllib.parse
 from influxdb import DataFrameClient
 
 from cleanflux.corrective_guard.corrective_guard import CorrectiveGuard
@@ -36,7 +36,7 @@ class Cleanflux(object):
         alt_data_list = []
         for query_string in queries:
             logging.debug("Checking {}".format(query_string))
-            query_sanitized = urllib.unquote(query_string).decode('string_escape')
+            query_sanitized = urllib.parse.unquote(query_string)#.decode('string_escape')
             alt_data = self.guard.get_data(user, password, schema, query_sanitized)
             if alt_data is not None:
                 # logging.debug("Got alternative data for query")

@@ -1,7 +1,6 @@
 import logging
 import numpy as np
 import json
-import httplib
 import requests
 from influxdb import DataFrameClient
 from influxdb.exceptions import  InfluxDBClientError, InfluxDBServerError
@@ -14,16 +13,6 @@ from cleanflux.utils.influx.date_manipulation import pd_timestamp_to_timestamp
 
 # ------------------------------------------------------------------------
 # LIB PATCHING
-
-def robustify_httplib_response_read():
-    def robustify(func):
-        def inner(*args):
-            try:
-                return func(*args)
-            except httplib.IncompleteRead, e:
-                return e.partial
-    httplib.HTTPResponse.read = robustify(httplib.HTTPResponse.read)
-
 
 def robustify_influxdb_client():
     def custom_request(self, url, method='GET', params=None, data=None,
@@ -101,6 +90,21 @@ def robustify_influxdb_client():
 
 
 # ------------------------------------------------------------------------
+# NUMPY DATA ENCODER
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NpEncoder, self).default(obj)
+
+
+# ------------------------------------------------------------------------
 # QUERYING: pandas FORMAT
 
 @statsd.timed('timer_pd_query_influxdb', use_ms=True)
@@ -158,4 +162,4 @@ def pd_result_to_influx_result(resultset_list, precision):
             query_dict['series'].append(series_dict)
         output_dict['results'].append(query_dict)
 
-    return json.dumps(output_dict)
+    return json.dumps(output_dict, cls=NpEncoder)

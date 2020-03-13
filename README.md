@@ -344,3 +344,8 @@ No support for parsing user and password from basic authentication request.
 Obviously, [trivago/Protector](https://github.com/trivago/Protector) is a major source of inspiration.
 
 Automatic Retention Policy selection has also been implemented by [Lupul/influxdb-grafana-rp-proxy](https://github.com/Lupul/influxdb-grafana-rp-proxy).
+
+
+## Author
+
+Jordan Besly [@p3r7](https://github.com/p3r7) ([blog](https://www.eigenbahn.com/)).

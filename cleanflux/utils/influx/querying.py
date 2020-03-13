@@ -68,6 +68,7 @@ def robustify_influxdb_client():
                 )
                 break
             except requests.exceptions.ConnectionError as e:
+                self._session = requests.Session()
                 _try += 1
                 if self._retries != 0:
                     retry = _try < self._retries

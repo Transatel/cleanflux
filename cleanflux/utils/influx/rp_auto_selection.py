@@ -151,7 +151,12 @@ def get_counter_aggregation_mode(from_part, aggregation_properties):
         logging.info('no known counter aggregation mode for schema ' + schema)
         return None
 
-    for rule in aggregation_properties[schema]:
+    aggreg_props_k = None
+    for k in [schema, 'default']:
+        if k in aggregation_properties:
+            aggreg_props_k = k
+
+    for rule in aggregation_properties[aggreg_props_k]:
         if re.match(rule['regexp'], measurement):
             return rule['function']
 

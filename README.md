@@ -239,10 +239,10 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 case "$1" in
     start)
-	    cd $DAEMON_PATH
-	    $DAEMON start
-	    exit $?
-	    ;;
+       cd $DAEMON_PATH
+       $DAEMON start
+       exit $?
+       ;;
     status)
         cd $DAEMON_PATH
         $DAEMON status

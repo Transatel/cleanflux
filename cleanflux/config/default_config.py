@@ -7,6 +7,8 @@ DEFAULT_CONFIG = {
     # Connection to the time series database API
     'backend_host': 'localhost',
     'backend_port': 8086,
+    'backend_user': None,
+    'backend_password': None,
 
     # Corrective rules
     'rules': [

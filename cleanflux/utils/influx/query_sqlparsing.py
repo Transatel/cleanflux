@@ -47,6 +47,16 @@ def stringify_sqlparsed(parsed):
     return query
 
 
+def sqlparsed_token_dump(token):
+    pprint(token)
+    pprint(type(token))
+    if hasattr(token, 'ttype'):
+        print(token.ttype)
+    else:
+        print("no ttype")
+    print(token.value)
+
+
 # ------------------------------------------------------------------------
 # TESTS: QUERY TYPE
 
@@ -267,25 +277,25 @@ def extract_from_helper(parsed, mode):
             continue
 
 
-def extract_measurement_from_query(schema, parsed):
-    measurement = extract_from_helper(parsed, "value")
-
-    if not measurement:
-        return None
-
-    parts = measurement.split('.')
+def parse_measurement_path(schema, measurement_path):
+    parts = measurement_path.split('.')
 
     new_parts = []
     prev_part = None
+    prev_part_delimiter = ''
     for part in parts:
         if part[0] == '"' and part[len(part) - 1] == '"':
             new_parts.append(part)
+        elif part[0] == '/' and part[len(part) - 1] == '/':
+            new_parts.append(part)
         else:
-            if part[0] == '"':
+            if part[0] in ['/', '"']:
                 prev_part = part
-            elif part[len(part) - 1] == '"':
+                prev_part_delimiter = part[0]
+            elif part[len(part) - 1] == prev_part_delimiter:
                 new_parts.append(prev_part + '.' + part)
                 prev_part = None
+                prev_part_delimiter = ''
             else:
                 if prev_part is None:
                     new_parts.append(part)
@@ -302,6 +312,13 @@ def extract_measurement_from_query(schema, parsed):
         return {'schema': schema, 'rp': parts[0].replace('"', ''), 'measurement': parts[1].replace('"', '')}
     else:
         return {'schema': schema, 'rp': None, 'measurement': parts[0].replace('"', '')}
+
+
+def extract_measurement_from_query(schema, parsed):
+    measurement_path = extract_from_helper(parsed, "value")
+    if not measurement_path:
+        return None
+    return parse_measurement_path(schema, measurement_path)
 
 
 # ------------------------------------------------------------------------
@@ -548,3 +565,109 @@ def get_query_time_window(query):
         time_bounds['to'] = influx_date_manipulation.get_now_datetime()
     query_window_timedelta = time_bounds['to'] - time_bounds['from']
     return query_window_timedelta
+
+
+# ------------------------------------------------------------------------
+# CONTINUOUS QUERIES
+
+def get_cq_schema(parsed):
+    has_on = False
+    has_whitespace = False
+    for i, token in enumerate(parsed.tokens):
+        if has_whitespace:
+            if isinstance(token, sqlparse.sql.Identifier):
+                return token.value
+            elif isinstance(token, bytes) or isinstance(token, str):
+                return token
+            else:
+                return None
+        if hasattr(token, 'ttype') and token.ttype == sqlparse.tokens.Keyword and token.value.upper() == 'ON':
+            has_on = True
+            continue
+        if has_on:
+            if not has_whitespace:
+                if token.ttype == sqlparse.tokens.Whitespace:
+                    has_whitespace = True
+                    continue
+                else:
+                    return None
+
+
+def get_cq_subquery(parsed):
+    for i, token in enumerate(parsed.tokens):
+        if isinstance(token, sqlparse.sql.Begin):
+            subquery = sqlparse_query(token.value[len("BEGIN "):])
+    return subquery
+
+
+def get_cq_interval(parsed):
+    subquery = get_cq_subquery(parsed)
+    if not subquery:
+        return None
+    return extract_time_interval_group_by(subquery)
+
+
+def get_cq_from(parsed):
+    subquery = get_cq_subquery(parsed)
+    if not subquery:
+        return None
+    has_from = False
+    has_whitespace = False
+    for i, token in enumerate(subquery.tokens):
+        if has_whitespace:
+            if isinstance(token, sqlparse.sql.Identifier):
+                return token.value
+            elif isinstance(token, sqlparse.sql.Operation):
+                v = token.value
+                next_token = subquery.tokens[i + 1]
+                if hasattr(next_token, 'ttype') \
+                   and next_token.ttype == sqlparse.tokens.Operator:
+                    v += next_token.value
+                return v
+            elif isinstance(token, bytes) or isinstance(token, str):
+                return token
+            else:
+                return None
+        if hasattr(token, 'ttype') and token.ttype == sqlparse.tokens.Keyword and token.value.upper() == 'FROM':
+            has_from = True
+            continue
+        if has_from:
+            if not has_whitespace:
+                if token.ttype == sqlparse.tokens.Whitespace:
+                    has_whitespace = True
+                    continue
+                else:
+                    return None
+
+
+def get_cq_into(parsed):
+    subquery = get_cq_subquery(parsed)
+    if not subquery:
+        return None
+    has_into = False
+    has_whitespace = False
+
+    for i, token in enumerate(subquery.tokens):
+        if has_whitespace:
+            if isinstance(token, sqlparse.sql.Identifier):
+                v = token.value
+                next_token = subquery.tokens[i + 1]
+                if hasattr(next_token, 'ttype') \
+                   and str(next_token.ttype) == 'Token.Name.Placeholder':
+                    v += next_token.value
+                    # NB: case :MEASUREMENT
+                return v
+            elif isinstance(token, bytes) or isinstance(token, str):
+                return token
+            else:
+                return None
+        if hasattr(token, 'ttype') and token.ttype == sqlparse.tokens.Keyword and token.value.upper() == 'INTO':
+            has_into = True
+            continue
+        if has_into:
+            if not has_whitespace:
+                if token.ttype == sqlparse.tokens.Whitespace:
+                    has_whitespace = True
+                    continue
+                else:
+                    return None

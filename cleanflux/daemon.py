@@ -7,6 +7,7 @@ import traceback
 from io import StringIO
 from socket import gethostname
 from datadog import initialize as initialize_statsd
+from datadog.dogstatsd import statsd # global object
 
 from cleanflux.proxy import server
 from cleanflux.proxy import request_handler
@@ -88,6 +89,11 @@ class HttpDaemon(object):
             hostname = gethostname()
             initialize_statsd(statsd_host=statsd_host, statsd_port=statsd_port,
                               statsd_constant_tags=['host:' + hostname])
+        else:
+            def custom_send_to_server(packet):
+                return
+            setattr(statsd, '_send_to_server', custom_send_to_server)
+            setattr(statsd, '_send', custom_send_to_server)
 
     def run(self):
         self.configure_logging()

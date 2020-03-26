@@ -34,9 +34,9 @@ class CorrectiveGuard(object):
     @statsd.timed('timer_corrective_guard', use_ms=True)
     def enrich_rp_conf_from_db(self, schema_list=[]):
         if not self.auto_retrieve_retention_policies:
-            logging.info("Automatic retrieval of retention policies disabled by config")
+            logging.info("Automatic retrieval of RPs disabled by config")
             return
-        logging.info("Automatic retrieval of retention policies has started")
+        logging.info("Automatic retrieval of active RPs from DB has started")
         retention_policies_auto = get_rp_list(self.backend_host, self.backend_port,
                                               self.backend_user, self.backend_password)
         for rp, props in retention_policies_auto.items():

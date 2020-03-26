@@ -102,7 +102,6 @@ class HttpDaemon(object):
         robustify_influxdb_client()
         self.show_startup_message()
 
-        logging.info('Retrieving list of active RPs from DB')
         self.cleanflux.guard.enrich_rp_conf_from_db()
 
         logging.info('Daemon is starting')

@@ -110,7 +110,7 @@ def start_proxy(config):
     cleanflux = Cleanflux(config.backend_host, config.backend_port,
                           config.backend_user, config.backend_password,
                           config.rules,
-                          config.retention_policies,
+                          config.auto_retrieve_retention_policies, config.retention_policies,
                           config.aggregation_properties,
                           config.counter_overflows,
                           config.max_nb_points_per_query,

@@ -14,7 +14,9 @@ class Cleanflux(object):
     """
 
     def __init__(self, backend_host, backend_port, backend_user, backend_password,
-                 rules, retention_policies, aggregation_properties, counter_overflows,
+                 rules,
+                 auto_retrieve_retention_policies, retention_policies,
+                 aggregation_properties, counter_overflows,
                  max_nb_points_per_query, max_nb_points_per_series, safe_mode=True):
         """
         :param rules: A list of rules to evaluate
@@ -27,8 +29,9 @@ class Cleanflux(object):
         self.backend_password = backend_password
 
         self.guard = CorrectiveGuard(backend_host, backend_port, backend_user, backend_password,
-                                     rules, retention_policies, aggregation_properties,
-                                     counter_overflows,
+                                     rules,
+                                     auto_retrieve_retention_policies, retention_policies,
+                                     aggregation_properties, counter_overflows,
                                      max_nb_points_per_query, max_nb_points_per_series)
         self.safe_mode = safe_mode
 

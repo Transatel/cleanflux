@@ -25,7 +25,8 @@ DEFAULT_CONFIG = {
     'aggregation_properties': [],
 
     # Retention Policies definition, for automatic selection depending on time interval
-    'retention_policies': {},
+    'auto_retrieve_retention_policies': True, # enable / disable auto retrieve at startup
+    'retention_policies': {}, # overrides
 
     # Run in foreground?
     'foreground': False,

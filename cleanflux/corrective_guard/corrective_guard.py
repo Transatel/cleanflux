@@ -14,10 +14,12 @@ class CorrectiveGuard(object):
     """
 
     def __init__(self, backend_host, backend_port, backend_user, backend_password,
-                 rule_names, retention_policies, aggregation_properties,
-                 counter_overflows,
+                 rule_names,
+                 auto_retrieve_retention_policies, retention_policies,
+                 aggregation_properties, counter_overflows,
                  max_nb_points_per_query, max_nb_points_per_series):
         self.rules = import_rules(backend_host, backend_port, rule_names)
+        self.auto_retrieve_retention_policies = auto_retrieve_retention_policies
         self.retention_policies = retention_policies
         self.aggregation_properties = aggregation_properties
         self.counter_overflows = counter_overflows
@@ -31,6 +33,10 @@ class CorrectiveGuard(object):
 
     @statsd.timed('timer_corrective_guard', use_ms=True)
     def enrich_rp_conf_from_db(self, schema_list=[]):
+        if not self.auto_retrieve_retention_policies:
+            logging.info("Automatic retrieval of retention policies disabled by config")
+            return
+        logging.info("Automatic retrieval of retention policies has started")
         retention_policies_auto = get_rp_list(self.backend_host, self.backend_port,
                                               self.backend_user, self.backend_password)
         for rp, props in retention_policies_auto.items():

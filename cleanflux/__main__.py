@@ -107,12 +107,14 @@ def start_proxy(config):
     :param config:
     :return:
     """
-    cleanflux = Cleanflux(config.backend_host, config.backend_port, config.rules,
-                                                                 config.retention_policies,
-                                                                 config.aggregation_properties,
-                                                                 config.counter_overflows,
-                                                                 config.max_nb_points_per_query,
-                                                                 config.max_nb_points_per_series)
+    cleanflux = Cleanflux(config.backend_host, config.backend_port,
+                          config.backend_user, config.backend_password,
+                          config.rules,
+                          config.auto_retrieve_retention_policies, config.retention_policies,
+                          config.aggregation_properties,
+                          config.counter_overflows,
+                          config.max_nb_points_per_query,
+                          config.max_nb_points_per_series)
     http_proxy_daemon = HttpDaemon(config=config, cleanflux=cleanflux)
 
     daemon = daemonocle.Daemon(

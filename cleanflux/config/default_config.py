@@ -7,6 +7,8 @@ DEFAULT_CONFIG = {
     # Connection to the time series database API
     'backend_host': 'localhost',
     'backend_port': 8086,
+    'backend_user': None,
+    'backend_password': None,
 
     # Corrective rules
     'rules': [
@@ -23,7 +25,8 @@ DEFAULT_CONFIG = {
     'aggregation_properties': [],
 
     # Retention Policies definition, for automatic selection depending on time interval
-    'retention_policies': {},
+    'auto_retrieve_retention_policies': True, # enable / disable auto retrieve at startup
+    'retention_policies': {}, # overrides
 
     # Run in foreground?
     'foreground': False,

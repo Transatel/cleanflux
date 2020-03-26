@@ -27,10 +27,15 @@ Automatic Retention Policy selection is implemented ([source](cleanflux/utils/in
 
 This corrects this long standing limitation of InfluxDB that is tracked primarily in [issue #7198](https://github.com/influxdata/influxdb/issues/7198) (with interesting discussion in [issue #6910](https://github.com/influxdata/influxdb/issues/6910) and [issue #2625](https://github.com/influxdata/influxdb/issues/2625)).
 
-Right now, schemas and their retention policies must be declared by hand in the configuration file.
-It will only activate for queries targeting schemas declared this way.
+Active retention policies for each schema are retrieved automatically from the InfluxDB backend at Cleanflux startup. It only detect retention policies referenced in continuous queires with same source and destination measurement name.
 
-It also only activates when no retention policy is explicitly defined in the query.
+This can be disabled by config:
+
+    auto_retrieve_retention_policies: False
+
+Additionally, retention policies can be manually defined in the configuration file. This feature can also be used to override retention policies retrieved from database (e.g. to ignore one or when using Kapacitor instead of CQs).
+
+Automatic Retention Policy only activates when no retention policy is explicitly defined in the query.
 
 It will only work if fields names are kept the same across retention policies.
 
@@ -72,6 +77,8 @@ Configuration should follow this syntax:
           function: sum
         - regexp: 'gauge_.*'
           function: mean
+
+If `auto_retrieve_retention_policies` is disabled (set to `False`), the retention policies should be declared manually:
 
     retention_policies:
       my_awesome_schema:

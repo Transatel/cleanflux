@@ -1,5 +1,6 @@
 # coding=utf-8
 import logging
+from pprint import pprint
 import urllib.parse
 from influxdb import DataFrameClient
 
@@ -12,25 +13,35 @@ class Cleanflux(object):
     The main cleanflux class which detects queries that need to be sanitized
     """
 
-    def __init__(self, backend_host, backend_port, rules, retention_policies, aggregation_properties, counter_overflows,
+    def __init__(self, backend_host, backend_port, backend_user, backend_password,
+                 rules,
+                 auto_retrieve_retention_policies, retention_policies,
+                 aggregation_properties, counter_overflows,
                  max_nb_points_per_query, max_nb_points_per_series, safe_mode=True):
         """
         :param rules: A list of rules to evaluate
         :param safe_mode: If set to True, allow the query in case it can not be parsed
         :return:
         """
-
         self.backend_host = backend_host
         self.backend_port = backend_port
+        self.backend_user = backend_user
+        self.backend_password = backend_password
 
-        self.guard = CorrectiveGuard(backend_host, backend_port, rules, retention_policies, aggregation_properties,
-                                     counter_overflows,
+        self.guard = CorrectiveGuard(backend_host, backend_port, backend_user, backend_password,
+                                     rules,
+                                     auto_retrieve_retention_policies, retention_policies,
+                                     aggregation_properties, counter_overflows,
                                      max_nb_points_per_query, max_nb_points_per_series)
         self.safe_mode = safe_mode
 
+
     def get_alt_data(self, user, password, schema, queries, precision):
 
-        # return None
+        if not user and not password \
+                and self.backend_user and self.backend_password:
+            user = self.backend_user
+            password = self.backend_password
 
         got_alt_data = False
         alt_data_list = []

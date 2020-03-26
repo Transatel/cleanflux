@@ -101,6 +101,9 @@ class HttpDaemon(object):
         # robustify_httplib_response_read()
         robustify_influxdb_client()
         self.show_startup_message()
+
+        self.cleanflux.guard.enrich_rp_conf_from_db()
+
         logging.info('Daemon is starting')
         server_address = (self.config.host, self.config.port)
         backend_address = (self.config.backend_host, self.config.backend_port)
